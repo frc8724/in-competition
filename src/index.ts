@@ -1,5 +1,7 @@
 import "dotenv/config";
 
+import { join } from "path";
+
 import express from "express";
 import cors from "cors";
 import http from "http";
@@ -63,6 +65,31 @@ app.get("/rankings", async (req, res) => {
     res.json(rankings);
   } catch (e) {
     res.status(500).json({ ok: false });
+  }
+});
+
+app.get("/avatar/:team", async (req, res) => {
+  try {
+    const { data } = await axios(
+      `https://www.thebluealliance.com/api/v3/team/frc${
+        req.params.team
+      }/media/${new Date().getFullYear()}`,
+      {
+        headers: { "X-TBA-Auth-Key": process.env.TBA_API_KEY! },
+      }
+    );
+
+    const avatar = data.find((m: { type: string }) => m.type === "avatar");
+
+    if (!avatar) {
+      throw null;
+    }
+
+    res
+      .contentType("image/png")
+      .send(Buffer.from(avatar.details.base64Image, "base64"));
+  } catch (e) {
+    res.contentType("image/png").sendFile(join(__dirname, "../first.png"));
   }
 });
 
