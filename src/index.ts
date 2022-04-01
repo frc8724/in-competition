@@ -36,14 +36,31 @@ app.get("/event", async (req, res) => {
 
 app.get("/matches", async (req, res) => {
   try {
-    const { data: event } = await axios(
+    const { data: matches } = await axios(
       `https://www.thebluealliance.com/api/v3/team/${TEAM_KEY}/event/${EVENT_KEY}/matches`,
       {
         headers: { "X-TBA-Auth-Key": process.env.TBA_API_KEY! },
       }
     );
 
-    res.json(event);
+    res.json(matches);
+  } catch (e) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+app.get("/rankings", async (req, res) => {
+  try {
+    const {
+      data: { rankings },
+    } = await axios(
+      `https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/rankings`,
+      {
+        headers: { "X-TBA-Auth-Key": process.env.TBA_API_KEY! },
+      }
+    );
+
+    res.json(rankings);
   } catch (e) {
     res.status(500).json({ ok: false });
   }
