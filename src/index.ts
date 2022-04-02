@@ -24,9 +24,6 @@ app.get("/", (req, res) => {
 app.get("/currentEvent", async (req, res) => {
   const now = DateTime.now();
 
-  console.log(`now: ${now.year}`);
-  console.log(`team: ${TEAM_KEY}`);
-
   try {
     const { data: events } = await axios(
       `https://www.thebluealliance.com/api/v3/team/${TEAM_KEY}/events/${now.year}`,
@@ -35,23 +32,17 @@ app.get("/currentEvent", async (req, res) => {
       }
     );
 
-    console.log(events);
-
     const event = events.find((e: any) => {
-      const start = DateTime.fromSQL(e.start_date);
-      const end = DateTime.fromSQL(e.end_date);
+      const start = DateTime.fromSQL(e.start_date).startOf("day");
+      const end = DateTime.fromSQL(e.end_date).endOf("day");
 
       return now > start && now < end;
     });
-
-    console.log(event);
 
     if (!event) throw null;
 
     res.json(event);
   } catch (e) {
-    console.log(e);
-
     res.status(404).end();
   }
 });
