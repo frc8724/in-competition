@@ -32,9 +32,14 @@ app.get("/currentEvent", async (req, res) => {
       }
     );
 
-    const event = events.find((e: any) => {
-      const start = DateTime.fromSQL(e.start_date).startOf("day");
-      const end = DateTime.fromSQL(e.end_date).endOf("day");
+    const event = events.find((event: any) => {
+      const start = DateTime.fromSQL(event.start_date, {
+        zone: event.timezone,
+      }).startOf("day");
+
+      const end = DateTime.fromSQL(event.end_date, {
+        zone: event.timezone,
+      }).endOf("day");
 
       return now > start && now < end;
     });
