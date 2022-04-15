@@ -67,6 +67,21 @@ app.get("/event/:event/matches", async (req, res) => {
   }
 });
 
+app.get("/event/:event/matches/all", async (req, res) => {
+  try {
+    const { data: matches } = await axios(
+      `https://www.thebluealliance.com/api/v3/event/${req.params.event}/matches/simple`,
+      {
+        headers: { "X-TBA-Auth-Key": process.env.TBA_API_KEY! },
+      }
+    );
+
+    res.json(matches);
+  } catch (e) {
+    res.status(404).end();
+  }
+});
+
 app.get("/event/:event/rankings", async (req, res) => {
   try {
     const {
