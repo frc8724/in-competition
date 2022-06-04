@@ -22,34 +22,42 @@ app.get("/", (req, res) => {
 });
 
 app.get("/currentEvent", async (req, res) => {
-  const now = DateTime.now();
+  const { data: event } = await axios(
+    "https://www.thebluealliance.com/api/v3/event/2022bc",
+    {
+      headers: { "X-TBA-Auth-Key": process.env.TBA_API_KEY! },
+    }
+  );
 
-  try {
-    const { data: events } = await axios(
-      `https://www.thebluealliance.com/api/v3/team/${TEAM_KEY}/events/${now.year}`,
-      {
-        headers: { "X-TBA-Auth-Key": process.env.TBA_API_KEY! },
-      }
-    );
+  res.json(event);
+  // const now = DateTime.now();
 
-    const event = events.find((event: any) => {
-      const start = DateTime.fromSQL(event.start_date, {
-        zone: event.timezone,
-      }).startOf("day");
+  // try {
+  //   const { data: events } = await axios(
+  //     `https://www.thebluealliance.com/api/v3/team/${TEAM_KEY}/events/${now.year}`,
+  //     {
+  //       headers: { "X-TBA-Auth-Key": process.env.TBA_API_KEY! },
+  //     }
+  //   );
 
-      const end = DateTime.fromSQL(event.end_date, {
-        zone: event.timezone,
-      }).endOf("day");
+  //   const event = events.find((event: any) => {
+  //     const start = DateTime.fromSQL(event.start_date, {
+  //       zone: event.timezone,
+  //     }).startOf("day");
 
-      return now > start && now < end;
-    });
+  //     const end = DateTime.fromSQL(event.end_date, {
+  //       zone: event.timezone,
+  //     }).endOf("day");
 
-    if (!event) throw null;
+  //     return now > start && now < end;
+  //   });
 
-    res.json(event);
-  } catch (e) {
-    res.status(404).end();
-  }
+  //   if (!event) throw null;
+
+  //   res.json(event);
+  // } catch (e) {
+  //   res.status(404).end();
+  // }
 });
 
 app.get("/event/:event/matches", async (req, res) => {
